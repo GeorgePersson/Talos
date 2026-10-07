@@ -7,6 +7,11 @@ with several identities at once. Group an application's website with that
 identity's email inbox, sign into each normally, and move between roles without
 juggling browser windows or logging everyone out.
 
+![Talos demo: isolated accounts, shared tabs, locator picker and API requests](docs/media/talos-demo.gif)
+
+Watch the 35-second walkthrough above, or [download the MP4](docs/media/talos-demo.mp4).
+It uses a local demo website and pretend identities. [Demo steps and transcript](docs/demo.md).
+
 **1.0 release candidate:** Talos targets Windows, macOS and Linux, including
 Omarchy/Hyprland. Windows is locally verified; native macOS, Linux and Wayland
 checks run in [GitHub Actions](https://github.com/GeorgePersson/Talos/actions).
@@ -32,9 +37,13 @@ npm ci
 npm start
 ```
 
-The first workspace has three temporary groups: **Investor**, **Adviser**, and
-**Admin**. Enter your application URL in each group and sign into a different
+The first workspace has three temporary groups: **Account 1**, **Account 2**, and
+**Account 3**. Enter your application URL in each group and sign into a different
 account. `localhost:3000` works for development sites too.
+
+These are starting labels, not fixed roles. Rename groups for your own testing
+workflow and add as many as you need within the workspace limits. Existing
+saved workspaces keep their group names when you update Talos.
 
 Groups appear in a compact row at the top, with a **+** button immediately after
 them to create another group. The row below shows only the selected
@@ -151,7 +160,9 @@ npm run demo
 ```
 
 Open `http://127.0.0.1:4173` in several groups. Sign in with a pretend identity in
-each. Attach `http://127.0.0.1:4173/inbox` as a demo inbox. The page displays its
+each. Open `http://127.0.0.1:4173/inbox` in another tab in the same group to try the
+demo inbox. For real email, use your Gmail, Outlook or other webmail website;
+Talos does not provide an inbox service. The page displays its
 cookies, local and session storage, IndexedDB, Cache Storage, and service worker
 count. Use shared tabs and reset to see the difference. This is a local storage
 fixture, not a real authentication or email service.

@@ -1,0 +1,16 @@
+Testing with multiple accounts shouldn't mean juggling browser windows and constantly logging in and out.
+
+That frustration led me to build Talos: an open-source browser workspace for QA designers and testers.
+
+Each account gets its own isolated session. Your application's tabs and that account's Gmail, Outlook or other webmail can sit together in a named group. Switch accounts without losing your place, or open more tabs that deliberately share the same login.
+
+It keeps the familiar browser controls and Chromium DevTools, with a few focused additions: a Playwright locator picker, an API tester that can use the current account's session, and opt-in live Playwright integration.
+
+The 1.0 release candidate has downloads for Windows, macOS and Linux. No Docker required.
+
+I've attached a short walkthrough using dummy accounts. Talos is MIT-licensed, and I'd love feedback from other testers: what would make multi-account QA easier for you?
+
+Try it, report a bug, suggest a feature or contribute:
+https://github.com/GeorgePersson/Talos
+
+#QualityAssurance #SoftwareTesting #OpenSource

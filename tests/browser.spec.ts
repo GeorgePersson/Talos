@@ -82,6 +82,11 @@ test.afterEach(async () => {
 });
 
 test("trusted shell serves only public assets and websites cannot acquire its bridge", async () => {
+  expect((await state()).accounts.map((account: any) => account.name)).toEqual([
+    "Account 1",
+    "Account 2",
+    "Account 3",
+  ]);
   expect(shell.url()).toBe("talos://app/index.html");
   const responses = await app.evaluate(async ({ session }) => {
     const ses = session.fromPartition("talos-shell");
@@ -322,60 +327,60 @@ test("appearance settings preview, persistence, defaults and website styling", a
 });
 test("isolation, shared tabs, inboxes, popup session and reset", async () => {
   const initial = await state();
-  const investor = initial.accounts[0];
-  const adviser = initial.accounts[1];
-  const investorURL = `${fixture.url}/?identity=investor`;
-  const adviserURL = `${fixture.url}/?identity=adviser`;
-  await command({ type: "navigate", url: investorURL });
-  await ready(investorURL);
-  const stored = await content(investorURL, "fixture.seed('investor')");
+  const accountOne = initial.accounts[0];
+  const accountTwo = initial.accounts[1];
+  const accountOneURL = `${fixture.url}/?identity=accountOne`;
+  const accountTwoURL = `${fixture.url}/?identity=accountTwo`;
+  await command({ type: "navigate", url: accountOneURL });
+  await ready(accountOneURL);
+  const stored = await content(accountOneURL, "fixture.seed('accountOne')");
   expect(stored).toMatchObject({
-    local: "investor",
-    indexed: "investor",
-    cache: "investor",
+    local: "accountOne",
+    indexed: "accountOne",
+    cache: "accountOne",
     workers: 1,
     node: "undefined",
     bridge: "undefined",
   });
   await command({ type: "activate-tab", tabId: initial.tabs[1].id });
-  await command({ type: "navigate", url: adviserURL });
-  await ready(adviserURL);
-  expect(await content(adviserURL, "fixture.read()")).toMatchObject({
+  await command({ type: "navigate", url: accountTwoURL });
+  await ready(accountTwoURL);
+  expect(await content(accountTwoURL, "fixture.read()")).toMatchObject({
     cookie: "",
     local: null,
     indexed: null,
     cache: null,
     workers: 0,
   });
-  await content(adviserURL, "fixture.seed('adviser')");
-  expect(await content(investorURL, "fixture.read()")).toMatchObject({
-    local: "investor",
-    indexed: "investor",
-    cache: "investor",
+  await content(accountTwoURL, "fixture.seed('accountTwo')");
+  expect(await content(accountOneURL, "fixture.read()")).toMatchObject({
+    local: "accountOne",
+    indexed: "accountOne",
+    cache: "accountOne",
   });
-  const investorCache = await content(
-    investorURL,
+  const accountOneCache = await content(
+    accountOneURL,
     "fetch('/cached').then(r=>r.text())",
   );
-  const adviserCache = await content(
-    adviserURL,
+  const accountTwoCache = await content(
+    accountTwoURL,
     "fetch('/cached').then(r=>r.text())",
   );
-  expect(investorCache).not.toBe(adviserCache);
-  expect(await content(investorURL, "fetch('/cached').then(r=>r.text())")).toBe(
-    investorCache,
-  );
+  expect(accountOneCache).not.toBe(accountTwoCache);
+  expect(
+    await content(accountOneURL, "fetch('/cached').then(r=>r.text())"),
+  ).toBe(accountOneCache);
   const sharedURL = `${fixture.url}/?identity=shared`;
-  await command({ type: "new-tab", accountId: investor.id, url: sharedURL });
+  await command({ type: "new-tab", accountId: accountOne.id, url: sharedURL });
   await ready(sharedURL);
   expect(await content(sharedURL, "fixture.read()")).toMatchObject({
-    local: "investor",
-    indexed: "investor",
-    cache: "investor",
+    local: "accountOne",
+    indexed: "accountOne",
+    cache: "accountOne",
     session: null,
   });
   await content(sharedURL, "fixture.seed('updated')");
-  expect(await content(investorURL, "fixture.read()")).toMatchObject({
+  expect(await content(accountOneURL, "fixture.read()")).toMatchObject({
     local: "updated",
     indexed: "updated",
   });
@@ -396,7 +401,7 @@ test("isolation, shared tabs, inboxes, popup session and reset", async () => {
   const inboxURL = `${fixture.url}/inbox`;
   await command({
     type: "new-tab",
-    accountId: investor.id,
+    accountId: accountOne.id,
     url: inboxURL,
     kind: "inbox",
   });
@@ -407,11 +412,11 @@ test("isolation, shared tabs, inboxes, popup session and reset", async () => {
   expect(await content(inboxURL, "fixture.read()")).toMatchObject({
     local: "updated",
   });
-  await command({ type: "reset-account", accountId: investor.id });
-  await ready(investorURL);
+  await command({ type: "reset-account", accountId: accountOne.id });
+  await ready(accountOneURL);
   await ready(sharedURL);
   await ready(inboxURL);
-  expect(await content(investorURL, "fixture.read()")).toMatchObject({
+  expect(await content(accountOneURL, "fixture.read()")).toMatchObject({
     cookie: "",
     local: null,
     session: null,
@@ -422,15 +427,15 @@ test("isolation, shared tabs, inboxes, popup session and reset", async () => {
   expect(await content(sharedURL, "fixture.read()")).toMatchObject({
     local: null,
   });
-  expect(await content(adviserURL, "fixture.read()")).toMatchObject({
-    local: "adviser",
-    indexed: "adviser",
-    cache: "adviser",
+  expect(await content(accountTwoURL, "fixture.read()")).toMatchObject({
+    local: "accountTwo",
+    indexed: "accountTwo",
+    cache: "accountTwo",
     workers: 1,
   });
   expect(
-    await content(investorURL, "fetch('/cached').then(r=>r.text())"),
-  ).not.toBe(investorCache);
+    await content(accountOneURL, "fetch('/cached').then(r=>r.text())"),
+  ).not.toBe(accountOneCache);
   expect(
     await app.evaluate(
       ({ webContents }, url) =>
@@ -774,8 +779,8 @@ test("group and inbox UI, error handling and remote navigation protections", asy
 });
 test("compact group tabs preserve selection and address-bar search displays a page", async () => {
   const initial = await state();
-  const investor = initial.accounts[0];
-  const adviser = initial.accounts[1];
+  const accountOne = initial.accounts[0];
+  const accountTwo = initial.accounts[1];
   await shell
     .getByRole("button", { name: "New shared tab", exact: true })
     .click();
@@ -785,16 +790,16 @@ test("compact group tabs preserve selection and address-bar search displays a pa
   await ready(website);
   const secondTab = (await state()).activeTabId;
   await expect(shell.getByRole("tab")).toHaveCount(2);
-  await shell.getByRole("button", { name: /^Adviser/ }).click();
+  await shell.getByRole("button", { name: /^Account 2/ }).click();
   await expect
     .poll(async () => (await state()).activeTabId)
-    .toBe(initial.tabs.find((t: any) => t.accountId === adviser.id).id);
+    .toBe(initial.tabs.find((t: any) => t.accountId === accountTwo.id).id);
   await expect(shell.getByRole("tab")).toHaveCount(1);
-  await shell.getByRole("button", { name: /^Investor/ }).click();
+  await shell.getByRole("button", { name: /^Account 1/ }).click();
   await expect.poll(async () => (await state()).activeTabId).toBe(secondTab);
   await expect(shell.getByRole("tab")).toHaveCount(2);
   for (const expectedTab of [
-    initial.tabs.find((t: any) => t.accountId === investor.id).id,
+    initial.tabs.find((t: any) => t.accountId === accountOne.id).id,
     secondTab,
   ]) {
     await app.evaluate(({ Menu }) => {
@@ -1080,28 +1085,28 @@ test("Playwright adapter connects to live group tabs and preserves their session
   const talos = await connectTalos(chromium, info.endpoint);
   try {
     const groups = await talos.groups();
-    expect(groups.some((group: any) => group.name === "Investor")).toBe(true);
-    const investor = await talos.group("Investor");
-    expect(investor.websites).toHaveLength(1);
-    expect(investor.inboxes).toHaveLength(1);
+    expect(groups.some((group: any) => group.name === "Account 1")).toBe(true);
+    const accountOne = await talos.group("Account 1");
+    expect(accountOne.websites).toHaveLength(1);
+    expect(accountOne.inboxes).toHaveLength(1);
     expect(
-      await investor.websites[0].evaluate(() =>
+      await accountOne.websites[0].evaluate(() =>
         localStorage.getItem("identity"),
       ),
     ).toBe("automation-user");
-    await investor.websites[0]
+    await accountOne.websites[0]
       .getByLabel("Demo identity")
       .fill("playwright-user");
-    await investor.websites[0]
+    await accountOne.websites[0]
       .getByRole("button", { name: "Sign in", exact: true })
       .click();
     await expect
       .poll(() => content(website, "localStorage.getItem('identity')"))
       .toBe("playwright-user");
-    const adviser = await talos.group(initial.accounts[1].id);
-    await adviser.websites[0].goto(`${fixture.url}/adviser`);
+    const accountTwo = await talos.group(initial.accounts[1].id);
+    await accountTwo.websites[0].goto(`${fixture.url}/accountTwo`);
     expect(
-      await adviser.websites[0].evaluate(() =>
+      await accountTwo.websites[0].evaluate(() =>
         localStorage.getItem("identity"),
       ),
     ).toBeNull();

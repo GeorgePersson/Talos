@@ -1069,7 +1069,7 @@ function createWindow() {
   void window.loadURL(shellURL);
   restore();
   if (!accounts.size) {
-    ["Investor", "Adviser", "Admin"].forEach((name, index) =>
+    ["Account 1", "Account 2", "Account 3"].forEach((name, index) =>
       createTab(createAccount(name, COLORS[index], false)),
     );
     activeTabId = [...tabs.keys()][0];

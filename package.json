@@ -1,6 +1,6 @@
 {
   "name": "talos-qa",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Talos: isolated website and inbox groups for multi-account QA testing.",
   "private": true,
   "desktopName": "org.talosqa.desktop.desktop",

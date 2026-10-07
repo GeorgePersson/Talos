@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0-rc.2
+
+- Fresh workspaces now start with Account 1, Account 2 and Account 3. Groups
+  remain editable; existing saved names are preserved.
+- Neutral account examples throughout the welcome screen, local demo and
+  Playwright integration guide.
+- A captioned 35-second GIF and MP4 walkthrough, a demo transcript and clearer
+  README instructions for grouping ordinary webmail tabs.
+
+The signing, provider compatibility and physical Omarchy/Hyprland acceptance
+limits described for the first candidate still apply.
+
 ## 1.0.0-rc.1
 
 The first release candidate for the Talos QA workspace.

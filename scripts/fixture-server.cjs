@@ -2,7 +2,7 @@ const { createServer } = require("node:http");
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><title>Talos test app</title>
 <style>body{margin:60px auto;max-width:640px;font:15px system-ui;color:#26392f;background:#fafbf7}h1{font:46px Georgia}p{line-height:1.7;color:#7c8c75}input,button{font:inherit;padding:12px;border:1px solid #cfdaca;border-radius:6px}button{cursor:pointer;background:#177e69;color:white}pre{padding:20px;background:#eef3e9;border-radius:9px;white-space:pre-wrap}a{color:#177e69}</style>
 <span>TALOS / LOCAL TEST FIXTURE</span><h1>Who’s signed in?</h1><p>This local demo mimics a login using browser storage. Open it under several Talos groups to see each identity stay separate.</p>
-<form id="login"><input id="identity" aria-label="Demo identity" placeholder="investor@example.test" required><button>Sign in</button></form><p><button id="logout">Sign out</button> <button id="popup">Open login popup</button> <a href="/inbox">Open demo inbox</a></p><pre id="output">Reading session…</pre>
+<form id="login"><input id="identity" aria-label="Demo identity" placeholder="account1@example.test" required><button>Sign in</button></form><p><button id="logout">Sign out</button> <button id="popup">Open login popup</button> <a href="/inbox">Open demo inbox</a></p><pre id="output">Reading session…</pre>
 <script>
 const db = () => new Promise((resolve,reject) => { const r=indexedDB.open('talos-test',1);r.onupgradeneeded=()=>r.result.createObjectStore('identity');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error); });
 window.fixture = {

@@ -8,7 +8,7 @@ confused with each other. Inboxes and website tabs are exposed separately.
    application, run `Talos.exe --qa-automation` on Windows, `talos --qa-automation`
    on Linux, or `open -a Talos --args --qa-automation` on macOS. Close the existing
    app first: a second launch focuses the process already using that profile.
-2. Open your websites, attach inboxes, and sign into each identity normally.
+2. Open your websites, open webmail tabs in the same groups, and sign into each identity normally.
 3. Choose **QA tools → Playwright** and copy the localhost endpoint.
 4. From this project, try `npm run playwright:connect -- http://127.0.0.1:PORT`.
    This example lists groups and page titles without changing the website.
@@ -26,12 +26,12 @@ import adapter from "./integrations/playwright/talos.cjs";
 
 const talos = await adapter.connectTalos(chromium, "http://127.0.0.1:PORT");
 try {
-  const investor = await talos.group("Investor");
-  const page = investor.websites[0];
+  const account = await talos.group("Account 1");
+  const page = account.websites[0];
   console.log(await page.title());
   // await page.getByRole('button', { name: 'Continue' }).click();
-  // await page.screenshot({ path: 'investor.png' });
-  // const inbox = investor.inboxes[0];
+  // await page.screenshot({ path: 'account.png' });
+  // const inbox = account.inboxes[0];
 } finally {
   await talos.disconnect();
 }

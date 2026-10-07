@@ -578,32 +578,32 @@ button:hover {
   font-size: 8px;
   margin-left: auto;
 }
-.card-investor {
+.card-account-one {
   left: 8px;
   top: 13px;
   transform: rotate(-7deg);
   color: #177e69;
 }
-.card-investor .mini-avatar {
+.card-account-one .mini-avatar {
   background: #e9f3ed;
 }
-.card-adviser {
+.card-account-two {
   left: 55px;
   top: 80px;
   transform: rotate(4deg);
   color: #6378ca;
   z-index: 1;
 }
-.card-adviser .mini-avatar {
+.card-account-two .mini-avatar {
   background: #eef0fa;
 }
-.card-admin {
+.card-account-three {
   left: 19px;
   top: 146px;
   transform: rotate(-3deg);
   color: #c47c3f;
 }
-.card-admin .mini-avatar {
+.card-account-three .mini-avatar {
   background: #fbf0e7;
 }
 .art-caption {
