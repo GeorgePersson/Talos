@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Update GitHub Actions for checkout, Node setup and artifact upload/download,
+  retaining pinned commit hashes. Check artifact upload/download compatibility
+  on every CI run before using those actions for release files.
+- Update esbuild to 0.28.2. Keep Node 24 typings and TypeScript 5 while compiler
+  major upgrades receive a separate migration review.
+
 ## 1.0.0-rc.2
 
 - Fresh workspaces now start with Account 1, Account 2 and Account 3. Groups
