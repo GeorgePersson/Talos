@@ -26,6 +26,24 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm audit --audit-level=moderate
+      - name: Create artifact compatibility probe
+        run: |
+          mkdir -p artifacts
+          printf 'Talos artifact round trip\n' > artifacts/ci-artifact-probe.txt
+      - name: Upload artifact compatibility probe
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ci-artifact-probe
+          path: artifacts/ci-artifact-probe.txt
+          retention-days: 1
+          if-no-files-found: error
+      - name: Download artifact compatibility probe
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ci-artifact-probe
+          path: artifacts/roundtrip
+      - name: Verify artifact round trip
+        run: cmp artifacts/ci-artifact-probe.txt artifacts/roundtrip/ci-artifact-probe.txt
       - name: Verify release tag matches package version
         if: startsWith(github.ref, 'refs/tags/')
         run: node -e "if(process.env.GITHUB_REF_NAME !== 'v' + require('./package.json').version) process.exit(1)"

@@ -3,7 +3,8 @@
 ## Unreleased
 
 - Update GitHub Actions for checkout, Node setup and artifact upload/download,
-  retaining pinned commit hashes.
+  retaining pinned commit hashes. Check artifact upload/download compatibility
+  on every CI run before using those actions for release files.
 - Update esbuild to 0.28.2. Keep Node 24 typings and TypeScript 5 while compiler
   major upgrades receive a separate migration review.
 
