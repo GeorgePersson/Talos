@@ -12,6 +12,7 @@ acceptance. Document failures and known limitations in the release notes.
    acceptance in `docs/linux.md`. Test real provider flows separately.
 5. Tag the exact verified commit as `v<version>` and push that tag. CI creates a
    **draft** GitHub release from that run's native artifacts and SHA-256 checksums.
+   CI verifies uploaded asset names and digests against the checksum manifest.
    A failed matrix never reaches the release job. No credentials are required
    for the local app or its automated fixture tests.
 6. Review the draft's files, checksum contents, OS/CPU labels and release notes.

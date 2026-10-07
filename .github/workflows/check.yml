@@ -151,7 +151,7 @@ jobs:
           pattern: Talos-*
           path: release
           merge-multiple: true
-      - run: npm run release:checksums
+      - run: npm run release:checksums -- --github-assets
       - name: Create draft for maintainer review
         env:
           GH_TOKEN: ${{ github.token }}
@@ -159,3 +159,11 @@ jobs:
           release_args=(--draft --verify-tag --title "Talos ${GITHUB_REF_NAME#v}" --notes-file CHANGELOG.md)
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then release_args+=(--prerelease); fi
           gh release create "$GITHUB_REF_NAME" release/* "${release_args[@]}"
+      - name: Verify uploaded filenames and checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts
+          release_api=$(gh release view "$GITHUB_REF_NAME" --json apiUrl --jq '.apiUrl')
+          gh api "$release_api" > artifacts/release-metadata.json
+          node scripts/verify-release.mjs release/SHA256SUMS.txt artifacts/release-metadata.json
