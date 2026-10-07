@@ -1,0 +1,29 @@
+name: Feature suggestion
+description: Suggest an improvement to the QA workflow.
+labels: [enhancement, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What testing problem would this solve?
+      description: Describe a concrete workflow and who encounters it.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested behaviour
+      description: Describe how a tester would use it. Mockups are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Existing alternatives
+      description: Can Chromium DevTools, Playwright, or an existing browser feature cover this?
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to help implement or test this.

@@ -1,0 +1,161 @@
+name: Check Talos
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+permissions:
+  contents: read
+jobs:
+  quality:
+    name: Formatting and dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm audit --audit-level=moderate
+      - name: Verify release tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: node -e "if(process.env.GITHUB_REF_NAME !== 'v' + require('./package.json').version) process.exit(1)"
+  desktop:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {
+              name: Windows x64,
+              os: windows-latest,
+              display: native,
+              package: true,
+            }
+          - {
+              name: macOS Apple Silicon,
+              os: macos-15,
+              display: native,
+              package: true,
+            }
+          - {
+              name: macOS Intel,
+              os: macos-15-intel,
+              display: native,
+              package: true,
+            }
+          - {
+              name: Linux x64 X11,
+              os: ubuntu-22.04,
+              display: x11,
+              package: true,
+            }
+          - {
+              name: Linux ARM64 X11,
+              os: ubuntu-22.04-arm,
+              display: x11,
+              package: true,
+            }
+          - {
+              name: Linux x64 Wayland,
+              os: ubuntu-22.04,
+              display: wayland,
+              package: false,
+            }
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install Linux runtime and test display
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libnss3 libasound2 libgbm1 libxss1 libxtst6 libnotify4 libsecret-1-0 libfuse2 xvfb xauth weston dbus-x11 desktop-file-utils
+      - run: npm ci
+      - name: Verify on Windows and macOS
+        if: matrix.display == 'native'
+        run: npm run check
+      - name: Verify on X11
+        if: matrix.display == 'x11'
+        run: dbus-run-session -- xvfb-run -a npm run check
+      - name: Verify on native Wayland
+        if: matrix.display == 'wayland'
+        run: bash scripts/check-wayland.sh
+      - name: Build distributables on their native OS
+        if: matrix.package
+        run: npm run dist -- --publish never
+      - name: Verify packaged app and Playwright adapter
+        if: matrix.package && runner.os != 'Linux'
+        run: npm run smoke:packaged -- --automation
+      - name: Verify packaged Linux app and launcher
+        if: matrix.package && runner.os == 'Linux'
+        run: |
+          dbus-run-session -- xvfb-run -a npm run smoke:packaged -- --automation
+          bash scripts/check-linux-launcher.sh
+      - name: Upload distributables
+        if: matrix.package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Talos-${{ runner.os }}-${{ runner.arch }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            release/*.exe
+            release/*.AppImage
+            release/*.tar.gz
+            release/*.dmg
+            release/*.zip
+      - name: Upload test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: diagnostics-${{ matrix.name }}
+          retention-days: 7
+          path: |
+            test-results/
+            artifacts/
+  release:
+    name: Draft verified release
+    needs: [quality, desktop]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: Talos-*
+          path: release
+          merge-multiple: true
+      - run: npm run release:checksums
+      - name: Create draft for maintainer review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_args=(--draft --verify-tag --title "Talos ${GITHUB_REF_NAME#v}" --notes-file CHANGELOG.md)
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then release_args+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" release/* "${release_args[@]}"

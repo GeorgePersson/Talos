@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible problem with Talos.
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Talos. Remove credentials, cookies, tokens,
+        private URLs and personal information from examples and logs.
+        Report vulnerabilities privately using the repository's Security tab.
+  - type: input
+    id: version
+    attributes:
+      label: Talos version
+      placeholder: 1.0.0-rc.1
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows, Linux X11, Linux Wayland, Omarchy / Hyprland, macOS]
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS version, CPU architecture and installation format.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use a local or public example where possible. For login issues, identify the provider and popup or redirect flow.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics or screenshots
+      description: Check screenshots and logs for private data before attaching them.

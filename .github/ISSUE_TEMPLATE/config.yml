@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and early ideas
+    url: https://github.com/GeorgePersson/Talos/discussions
+    about: Ask questions, discuss workflows and share testing feedback.
+  - name: Report a security vulnerability privately
+    url: https://github.com/GeorgePersson/Talos/security/advisories/new
+    about: Avoid posting exploit details or credentials in public issues.

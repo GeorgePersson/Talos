@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Talos — QA workspace</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="qa-styles.css" />
+    <link rel="stylesheet" href="compact.css" />
+  </head>
+  <body>
+    <header class="browser-chrome">
+      <div class="groups-line">
+        <div class="brand">
+          <span class="brand-mark">t<span>↗</span></span
+          >Talos
+        </div>
+        <nav id="accounts" aria-label="Account groups"></nav>
+        <button
+          id="new-account"
+          class="icon-button new-group"
+          aria-label="New account group"
+          title="New account group (Ctrl+Shift+N)"
+        >
+          ＋
+        </button>
+      </div>
+      <div class="tabs-line">
+        <div id="tabs" role="tablist" aria-label="Website tabs"></div>
+        <button
+          class="icon-button"
+          id="new-tab"
+          title="New tab in this account (Ctrl+T)"
+          aria-label="New shared tab"
+        >
+          ＋
+        </button>
+      </div>
+      <div class="address-line">
+        <button class="icon-button" id="back" title="Back" aria-label="Back">
+          ←
+        </button>
+        <button
+          class="icon-button"
+          id="forward"
+          title="Forward"
+          aria-label="Forward"
+        >
+          →
+        </button>
+        <button
+          class="icon-button"
+          id="reload"
+          title="Reload (Ctrl+R)"
+          aria-label="Reload"
+        >
+          ↻
+        </button>
+        <form id="address-form">
+          <span class="address-symbol">◇</span
+          ><input
+            id="address"
+            aria-label="Website address"
+            placeholder="Search or enter a website address"
+            autocomplete="off"
+            spellcheck="false"
+          /><span id="address-account"></span>
+        </form>
+        <button
+          class="tool-button qa-toggle"
+          id="qa-tools"
+          title="QA workspace (Ctrl+Shift+Q)"
+        >
+          QA tools
+        </button>
+        <button
+          class="tool-button"
+          id="devtools"
+          title="Open DevTools for this tab (F12)"
+        >
+          <span>⌘</span> DevTools
+        </button>
+        <button
+          class="icon-button reset-button"
+          id="reset"
+          title="Reset this account’s session"
+          aria-label="Reset session"
+        >
+          ⟲
+        </button>
+        <button
+          class="icon-button"
+          id="settings"
+          aria-label="Settings"
+          title="Settings (Ctrl/Cmd+,)"
+        >
+          ⚙
+        </button>
+        <button
+          class="icon-button"
+          id="browser-menu"
+          aria-label="Browser menu"
+          title="Browser menu"
+        >
+          ⋮
+        </button>
+      </div>
+    </header>
+    <main id="page"></main>
+    <section id="settings-page" aria-label="Settings" hidden>
+      <div class="settings-content">
+        <div class="settings-heading">
+          <div>
+            <span class="eyebrow">MAKE IT YOURS</span>
+            <h1>Settings</h1>
+          </div>
+          <button class="secondary" id="close-settings">
+            Back to browsing
+          </button>
+        </div>
+        <form id="appearance-form">
+          <h2>Appearance</h2>
+          <p>
+            Choose the colours for your Talos workspace. Website pages keep
+            their own styling.
+          </p>
+          <div class="palette-fields">
+            <div class="palette-field">
+              <label for="colour-background">Background</label>
+              <div class="colour-inputs">
+                <input
+                  id="colour-background"
+                  type="color"
+                  aria-label="Background colour"
+                /><input
+                  id="hex-background"
+                  aria-label="Background hex colour"
+                  maxlength="7"
+                  pattern="#[0-9a-fA-F]{6}"
+                  required
+                  spellcheck="false"
+                />
+              </div>
+            </div>
+            <div class="palette-field">
+              <label for="colour-text">Text</label>
+              <div class="colour-inputs">
+                <input
+                  id="colour-text"
+                  type="color"
+                  aria-label="Text colour"
+                /><input
+                  id="hex-text"
+                  aria-label="Text hex colour"
+                  maxlength="7"
+                  pattern="#[0-9a-fA-F]{6}"
+                  required
+                  spellcheck="false"
+                />
+              </div>
+            </div>
+            <div class="palette-field">
+              <label for="colour-accent">Accent</label>
+              <div class="colour-inputs">
+                <input
+                  id="colour-accent"
+                  type="color"
+                  aria-label="Accent colour"
+                /><input
+                  id="hex-accent"
+                  aria-label="Accent hex colour"
+                  maxlength="7"
+                  pattern="#[0-9a-fA-F]{6}"
+                  required
+                  spellcheck="false"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="palette-preview">
+            <span class="eyebrow">LIVE PREVIEW</span>
+            <h3>Your workspace, your colours.</h3>
+            <p>Groups, browser controls and QA tools follow this palette.</p>
+            <span class="preview-accent">Accent colour</span>
+          </div>
+          <div class="settings-actions">
+            <button type="submit" class="primary" id="save-appearance">
+              Save changes</button
+            ><button type="button" class="secondary" id="reset-appearance">
+              Reset to defaults</button
+            ><span
+              id="appearance-status"
+              role="status"
+              aria-live="polite"
+            ></span>
+          </div>
+          <p class="settings-note">
+            Changes preview immediately. Save to keep them after restarting
+            Talos, or go back to discard them.
+          </p>
+        </form>
+      </div>
+    </section>
+    <section id="qa-drawer" aria-label="QA workspace" hidden></section>
+    <form id="find-bar" hidden>
+      <input
+        id="find-text"
+        aria-label="Find in page"
+        placeholder="Find in page"
+      /><span id="find-count"></span
+      ><button type="button" id="find-prev" aria-label="Previous match">
+        ↑</button
+      ><button type="button" id="find-next" aria-label="Next match">↓</button
+      ><button type="button" id="find-close" aria-label="Close find">×</button>
+    </form>
+    <footer>
+      <span id="session-status"></span
+      ><span id="message" role="status" aria-live="polite"></span
+      ><span class="footer-hint"
+        >Independent sessions. Less window juggling.</span
+      >
+    </footer>
+    <dialog id="dialog"><form id="dialog-form"></form></dialog>
+    <script src="renderer.js"></script>
+  </body>
+</html>
