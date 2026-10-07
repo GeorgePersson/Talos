@@ -71,8 +71,8 @@ This option needs neither Node.js nor FUSE on the user's machine. For an
 AppImage, mark it executable and run it:
 
 ```sh
-chmod +x ./Talos-0.5.0-linux-x86_64.AppImage
-./Talos-0.5.0-linux-x86_64.AppImage
+chmod +x ./Talos-1.0.0-rc.1-linux-x86_64.AppImage
+./Talos-1.0.0-rc.1-linux-x86_64.AppImage
 ```
 
 Use the actual downloaded version and architecture in the filename. Legacy
