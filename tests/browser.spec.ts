@@ -904,6 +904,7 @@ test("failed cleanup blocks the group across restart until reset succeeds", asyn
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   app = await electron.launch({
+    chromiumSandbox: true,
     args: [".", `--qa-user-data=${dataDir}`],
     env,
   });

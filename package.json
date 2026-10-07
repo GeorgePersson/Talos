@@ -89,7 +89,7 @@
       ]
     },
     "mac": {
-      "icon": "assets/icon.png",
+      "icon": "assets/icon-mac.png",
       "artifactName": "Talos-${version}-mac-${arch}.${ext}",
       "target": [
         "dmg",

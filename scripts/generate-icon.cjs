@@ -38,6 +38,15 @@ app
   })()`);
     const png = Buffer.from(data.split(",")[1], "base64");
     fs.writeFileSync(path.join(__dirname, "../assets/icon.png"), png);
+    const macData = await win.webContents.executeJavaScript(`(async () => {
+      const img = new Image(); img.src = ${JSON.stringify(source)}; await img.decode();
+      const canvas = document.createElement('canvas'); canvas.width = canvas.height = 512;
+      canvas.getContext('2d').drawImage(img, 0, 0, 512, 512); return canvas.toDataURL('image/png');
+    })()`);
+    fs.writeFileSync(
+      path.join(__dirname, "../assets/icon-mac.png"),
+      Buffer.from(macData.split(",")[1], "base64"),
+    );
     const header = Buffer.alloc(22);
     header.writeUInt16LE(1, 2);
     header.writeUInt16LE(1, 4);
