@@ -31,7 +31,7 @@ jobs:
           mkdir -p artifacts
           printf 'Talos artifact round trip\n' > artifacts/ci-artifact-probe.txt
       - name: Upload artifact compatibility probe
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ci-artifact-probe
           path: artifacts/ci-artifact-probe.txt
@@ -129,7 +129,7 @@ jobs:
           bash scripts/check-linux-launcher.sh
       - name: Upload distributables
         if: matrix.package
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Talos-${{ runner.os }}-${{ runner.arch }}
           if-no-files-found: error
@@ -142,7 +142,7 @@ jobs:
             release/*.zip
       - name: Upload test diagnostics
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: diagnostics-${{ matrix.name }}
           retention-days: 7
