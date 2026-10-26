@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Update Electron to 44.9.3 to mitigate compromised eMudhra intermediate
+  certificates, and patch vulnerable fast-uri and undici build dependencies.
+- Update Playwright to 1.64.1, Node 24 typings and Prettier. Wait for the locator
+  inspector to be ready and acknowledge pointer input in integration and packaged
+  smoke tests, avoiding startup and native input timing failures.
+
 - Update GitHub Actions for checkout, Node setup and artifact upload/download,
   retaining pinned commit hashes. Check artifact upload/download compatibility
   on every CI run before using those actions for release files.

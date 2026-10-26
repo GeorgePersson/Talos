@@ -504,35 +504,54 @@ test("locator picker captures elements without clicking them and copies Playwrig
   await expect(
     sections.getByRole("button", { name: "DevTools", exact: true }),
   ).toHaveCount(0);
+  // Slow debugger setup reproduces the CI race: main-process state changes
+  // before inspect mode is ready to consume pointer input.
+  await app.evaluate(({ webContents }, url) => {
+    const wc = webContents
+      .getAllWebContents()
+      .find((wc) => wc.getURL() === url)!;
+    const send = wc.debugger.sendCommand.bind(wc.debugger);
+    wc.debugger.sendCommand = async (method, params, sessionId) => {
+      if (
+        method === "Overlay.setInspectMode" &&
+        params?.mode === "searchForNode"
+      )
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      return send(method, params, sessionId);
+    };
+  }, url);
   const pick = async (expression: string) => {
+    await shell
+      .getByRole("button", { name: "Pick an element", exact: true })
+      .click();
+    // The UI is updated after Overlay.setInspectMode and guest focus complete.
+    await expect(
+      shell.getByRole("button", { name: "Cancel picking", exact: true }),
+    ).toBeVisible();
     const position = await content(
       url,
       `(() => { const el = ${expression}; const rect = el.getBoundingClientRect(); const frame = el.ownerDocument.defaultView.frameElement; const offset = frame?.getBoundingClientRect(); return { x:rect.x+rect.width/2+(offset?.x||0)+(frame?.clientLeft||0), y:rect.y+rect.height/2+(offset?.y||0)+(frame?.clientTop||0) }; })()`,
     );
-    await shell
-      .getByRole("button", { name: "Pick an element", exact: true })
-      .click();
-    await expect.poll(async () => (await state()).locator.picking).toBe(true);
     await app.evaluate(
       async ({ webContents }, { url, position }) => {
         const wc = webContents
           .getAllWebContents()
           .find((wc) => wc.getURL() === url)!;
-        wc.sendInputEvent({
-          type: "mouseMove",
+        // Await Chromium's input acknowledgements instead of a fixed native-input delay.
+        await wc.debugger.sendCommand("Input.dispatchMouseEvent", {
+          type: "mouseMoved",
           x: Math.round(position.x),
           y: Math.round(position.y),
         });
-        await new Promise((resolve) => setTimeout(resolve, 80));
-        wc.sendInputEvent({
-          type: "mouseDown",
+        await wc.debugger.sendCommand("Input.dispatchMouseEvent", {
+          type: "mousePressed",
           button: "left",
           clickCount: 1,
           x: Math.round(position.x),
           y: Math.round(position.y),
         });
-        wc.sendInputEvent({
-          type: "mouseUp",
+        await wc.debugger.sendCommand("Input.dispatchMouseEvent", {
+          type: "mouseReleased",
           button: "left",
           clickCount: 1,
           x: Math.round(position.x),
