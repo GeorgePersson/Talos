@@ -71,13 +71,14 @@ async function main() {
     if (!guest) throw new Error("Packaged website did not load.");
     await guest.waitForFunction(() => typeof window.fixture === "object");
     await guest.evaluate(() => window.fixture.seed("packaged-user"));
-    const position = await guest.locator("#logout").boundingBox();
     await shell
       .getByRole("button", { name: "Pick an element", exact: true })
       .click();
-    await shell.waitForFunction(
-      async () => (await window.qa.state()).locator.picking,
-    );
+    // The internal picking flag is set before the debugger finishes setup.
+    await shell
+      .getByRole("button", { name: "Cancel picking", exact: true })
+      .waitFor();
+    const position = await guest.locator("#logout").boundingBox();
     await app.evaluate(
       async ({ webContents }, { website, position }) => {
         const wc = webContents
@@ -85,17 +86,21 @@ async function main() {
           .find((wc) => wc.getURL() === website);
         const x = Math.round(position.x + position.width / 2);
         const y = Math.round(position.y + position.height / 2);
-        wc.sendInputEvent({ type: "mouseMove", x, y });
-        await new Promise((resolve) => setTimeout(resolve, 80));
-        wc.sendInputEvent({
-          type: "mouseDown",
+        // Await Chromium's input acknowledgements instead of a fixed native-input delay.
+        await wc.debugger.sendCommand("Input.dispatchMouseEvent", {
+          type: "mouseMoved",
+          x,
+          y,
+        });
+        await wc.debugger.sendCommand("Input.dispatchMouseEvent", {
+          type: "mousePressed",
           button: "left",
           clickCount: 1,
           x,
           y,
         });
-        wc.sendInputEvent({
-          type: "mouseUp",
+        await wc.debugger.sendCommand("Input.dispatchMouseEvent", {
+          type: "mouseReleased",
           button: "left",
           clickCount: 1,
           x,
